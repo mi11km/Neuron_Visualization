@@ -7,12 +7,6 @@ public class PlayerMove : MonoBehaviour
     private float step;
     private float speed = 2.0f;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-    }
-
-    // Update is called once per frame
     void Update()
     {
         // Define step value for animation
@@ -28,6 +22,7 @@ public class PlayerMove : MonoBehaviour
         if (OVRInput.Get(OVRInput.Button.SecondaryThumbstickDown)) transform.Translate(Vector3.back * speed);
         if (OVRInput.Get(OVRInput.Button.SecondaryThumbstickLeft)) transform.Translate(Vector3.left * speed);
         if (OVRInput.Get(OVRInput.Button.SecondaryThumbstickRight)) transform.Translate(Vector3.right * speed);
-
+        if (OVRInput.Get(OVRInput.Button.Two)) transform.Translate(Vector3.up * speed);
+        if (OVRInput.Get(OVRInput.Button.One)) transform.Translate(Vector3.down * speed);
     }
 }

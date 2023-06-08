@@ -1,4 +1,7 @@
 using System;
+using System.IO;
+using System.Linq;
+using System.Text;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -11,30 +14,31 @@ public class NeuronGenerator : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        var lines = dataFactory().Split("\n");
+        string[] lines;
+        if (Application.platform == RuntimePlatform.WindowsEditor)
+        {
+            lines = readSWCFileToString("Scnn1a_473845048_m.swc").Split("\n");
+        }
+        else
+        {
+            lines = dataFactory().Split("\n");
+        }
+
         foreach (var line in lines)
         {
-            RenderingNeuronCompartment(line);
+            var compartmentDetail = line.Split(" "); // n type x y z radius parent
+            if (compartmentDetail.Length != 7) continue;
+            RenderingNeuronCompartment(compartmentDetail);
         }
     }
 
-    // Update is called once per frame
-    void Update()
+    void RenderingNeuronCompartment(string[] compartmentDetail)
     {
-    }
-
-    void RenderingNeuronCompartment(string data)
-    {
-        // data: n type x y z radius parent
-        var compartmentDetail = data.Split(" ");
         float neuronCompartmentRadius = float.Parse(compartmentDetail[5]) * 0.1f;
 
         GameObject neuronCompartmentObj = Instantiate(neuronCompartmentPrefab,
-            new Vector3(
-                float.Parse(compartmentDetail[2]) * 0.01f,
-                float.Parse(compartmentDetail[3]) * 0.01f, 
-                float.Parse(compartmentDetail[4]) * 0.01f),
-            Quaternion.identity);
+            new Vector3(float.Parse(compartmentDetail[2]) * 0.01f, float.Parse(compartmentDetail[3]) * 0.01f,
+                float.Parse(compartmentDetail[4]) * 0.01f), Quaternion.identity);
         if (compartmentDetail[1] == TypeCellBody)
         {
             neuronCompartmentRadius *= 0.2f;
@@ -43,9 +47,20 @@ public class NeuronGenerator : MonoBehaviour
         neuronCompartmentObj.transform.localScale = new Vector3(
             neuronCompartmentRadius, neuronCompartmentRadius, neuronCompartmentRadius);
 
-        neuronCompartmentObj.GetComponent<Renderer>().material.color
-            = new Color(Random.value, Random.value, Random.value, 1.0f);
-            // = Color.magenta;
+        neuronCompartmentObj.GetComponent<Renderer>().material.color =
+            new Color(Random.value, Random.value, Random.value, 1.0f);
+        // = Color.magenta;
+    }
+
+    string readSWCFileToString(string name)
+    {
+        string text;
+        string filePath = Path.Combine(Application.streamingAssetsPath, name);
+        using (StreamReader sr = new StreamReader(filePath, Encoding.UTF8))
+        {
+            text = sr.ReadToEnd();
+        }
+        return text;
     }
 
     String dataFactory()
