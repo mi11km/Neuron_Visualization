@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerMove : MonoBehaviour
+public class Player : MonoBehaviour
 {
     private float step;
     private float speed = 2.0f;
@@ -24,5 +24,7 @@ public class PlayerMove : MonoBehaviour
         if (OVRInput.Get(OVRInput.Button.SecondaryThumbstickRight)) transform.Translate(Vector3.right * speed);
         if (OVRInput.Get(OVRInput.Button.Two)) transform.Translate(Vector3.up * speed);
         if (OVRInput.Get(OVRInput.Button.One)) transform.Translate(Vector3.down * speed);
+        
+        if (OVRInput.Get(OVRInput.Button.Three)) transform.position = new Vector3(0, 0, 0);
     }
 }
