@@ -17,7 +17,7 @@ public class NeuronGenerator : MonoBehaviour
         string[] lines;
         if (Application.platform == RuntimePlatform.WindowsEditor)
         {
-            lines = readSWCFileToString("Scnn1a_473845048_m.swc").Split("\n");
+            lines = readSWCFileToString("pkj1599.swc").Split("\n");
         }
         else
         {
@@ -26,30 +26,31 @@ public class NeuronGenerator : MonoBehaviour
 
         foreach (var line in lines)
         {
-            var compartmentDetail = line.Split(" "); // n type x y z radius parent
+            var compartmentDetail = line.Split(" ", StringSplitOptions.RemoveEmptyEntries);
             if (compartmentDetail.Length != 7) continue;
+            Debug.Log(line);
             RenderingNeuronCompartment(compartmentDetail);
         }
     }
 
     void RenderingNeuronCompartment(string[] compartmentDetail)
     {
-        float neuronCompartmentRadius = float.Parse(compartmentDetail[5]) * 0.1f;
+        float neuronCompartmentRadius = float.Parse(compartmentDetail[5]);
 
         GameObject neuronCompartmentObj = Instantiate(neuronCompartmentPrefab,
-            new Vector3(float.Parse(compartmentDetail[2]) * 0.01f, float.Parse(compartmentDetail[3]) * 0.01f,
-                float.Parse(compartmentDetail[4]) * 0.01f), Quaternion.identity);
-        if (compartmentDetail[1] == TypeCellBody)
-        {
-            neuronCompartmentRadius *= 0.2f;
-        }
+            new Vector3(
+                float.Parse(compartmentDetail[2]), 
+                float.Parse(compartmentDetail[3]),
+                float.Parse(compartmentDetail[4])), 
+            Quaternion.identity);
 
         neuronCompartmentObj.transform.localScale = new Vector3(
             neuronCompartmentRadius, neuronCompartmentRadius, neuronCompartmentRadius);
-
-        neuronCompartmentObj.GetComponent<Renderer>().material.color =
-            new Color(Random.value, Random.value, Random.value, 1.0f);
-        // = Color.magenta;
+        neuronCompartmentObj.GetComponent<Renderer>().material.color = Color.magenta;
+        if (compartmentDetail[1] == TypeCellBody)
+        {
+            neuronCompartmentObj.GetComponent<Renderer>().material.color = Color.red; 
+        }
     }
 
     string readSWCFileToString(string name)
