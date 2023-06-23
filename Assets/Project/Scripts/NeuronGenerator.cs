@@ -46,9 +46,12 @@ public class NeuronGenerator : MonoBehaviour
             if (!neuron.compartments.TryGetValue(nc.parentId, out parent)) continue;
 
             var lineRenderer = neuronCompartmentObj.AddComponent<LineRenderer>();
-            lineRenderer.startWidth = 0.5f;
-            lineRenderer.endWidth = 0.5f;
             lineRenderer.SetPositions(new[] {position, new(parent.positionX, parent.positionY, parent.positionZ)});
+            lineRenderer.startWidth = nc.radius;
+            lineRenderer.endWidth = parent.radius;
+            lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
+            lineRenderer.startColor = new Color(1.0f, 0.3f, 0.25f);
+            lineRenderer.endColor = new Color(1.0f, 0.3f, 0.25f);
         }
     }
 
