@@ -3,66 +3,64 @@ using System.IO;
 using System.Text;
 using System.Collections;
 using System.Collections.Generic;
+using Project.Scripts;
 using UnityEngine;
 
 public class NeuronGenerator : MonoBehaviour
 {
     [SerializeField] private GameObject neuronCompartmentPrefab;
-    [SerializeField] private GameObject neuron;
-
-    const string TypeCellBody = "1";
+    [SerializeField] private GameObject neuronParent;
 
     // Start is called before the first frame update
     void Start()
     {
-        string[] lines;
-        if (Application.platform == RuntimePlatform.WindowsEditor)
+        string swcData;
+        switch (Application.platform)
         {
-            lines = readSWCFileToString("pkj1599.swc").Split("\n");
-        }
-        else
-        {
-            lines = dataFactory().Split("\n");
+            case RuntimePlatform.WindowsEditor:
+                swcData = ReadSwcFile("pkj1599.swc");
+                break;
+            default:
+                swcData = dataFactory();
+                break;
         }
 
-        foreach (var line in lines)
-        {
-            var compartmentDetail = line.Split(" ", StringSplitOptions.RemoveEmptyEntries);
-            if (compartmentDetail.Length != 7) continue;
-            Debug.Log(line);
-            RenderingNeuronCompartment(compartmentDetail);
-        }
+        var neron = new Neuron();
+        neron.Parse(swcData);
+        RenderingNeuron(neron);
     }
 
-    void RenderingNeuronCompartment(string[] compartmentDetail)
+    void RenderingNeuron(Neuron neuron)
     {
-        float neuronCompartmentRadius = float.Parse(compartmentDetail[5]);
-
-        GameObject neuronCompartmentObj = Instantiate(neuronCompartmentPrefab,
-            new Vector3(
-                float.Parse(compartmentDetail[2]), 
-                float.Parse(compartmentDetail[3]),
-                float.Parse(compartmentDetail[4])), 
-            Quaternion.identity);
-
-        neuronCompartmentObj.transform.parent = neuron.gameObject.transform;
-        neuronCompartmentObj.transform.localScale = new Vector3(
-            neuronCompartmentRadius, neuronCompartmentRadius, neuronCompartmentRadius);
-        neuronCompartmentObj.GetComponent<Renderer>().material.color = Color.magenta;
-        if (compartmentDetail[1] == TypeCellBody)
+        foreach (var nc in neuron.compartments.Values)
         {
-            neuronCompartmentObj.GetComponent<Renderer>().material.color = Color.red; 
+            Vector3 position = new Vector3(nc.positionX, nc.positionY, nc.positionZ);
+
+            GameObject neuronCompartmentObj = Instantiate(neuronCompartmentPrefab, position, Quaternion.identity);
+
+            neuronCompartmentObj.transform.parent = neuronParent.gameObject.transform;
+            neuronCompartmentObj.transform.localScale = new Vector3(nc.radius, nc.radius, nc.radius);
+            neuronCompartmentObj.GetComponent<Renderer>().material.color = Color.red;
+
+            NeuronCompartment parent;
+            if (!neuron.compartments.TryGetValue(nc.parentId, out parent)) continue;
+
+            var lineRenderer = neuronCompartmentObj.AddComponent<LineRenderer>();
+            lineRenderer.startWidth = 0.5f;
+            lineRenderer.endWidth = 0.5f;
+            lineRenderer.SetPositions(new[] {position, new(parent.positionX, parent.positionY, parent.positionZ)});
         }
     }
 
-    string readSWCFileToString(string name)
+    string ReadSwcFile(string fileName)
     {
         string text;
-        string filePath = Path.Combine(Application.streamingAssetsPath, name);
+        string filePath = Path.Combine(Application.streamingAssetsPath, fileName);
         using (StreamReader sr = new StreamReader(filePath, Encoding.UTF8))
         {
             text = sr.ReadToEnd();
         }
+
         return text;
     }
 
@@ -1667,6 +1665,7 @@ public class NeuronGenerator : MonoBehaviour
 1596 4 -136.637 32.819 147.000 0.500 1594
 1597 4 -139.462 32.821 135.000 0.530 1595
 1598 4 -139.467 32.821 144.000 0.530 1595
-1599 4 -145.577 32.821 135.000 0.500 1597";
+1599 4 -145.577 32.821 135.000 0.500 1597
+";
     }
 }
