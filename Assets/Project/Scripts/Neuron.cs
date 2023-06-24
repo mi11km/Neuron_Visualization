@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Unity.VisualScripting.Antlr3.Runtime;
+using System.Text.RegularExpressions;
 using UnityEngine;
 
 namespace Project.Scripts
@@ -56,12 +56,12 @@ namespace Project.Scripts
 
         static public NeuronCompartment Parse(string data)
         {
-            string[] compartmentDetail = data.Split(" ", StringSplitOptions.RemoveEmptyEntries);
-            if (compartmentDetail.Length < 7)
+            if (!Regex.IsMatch(data, @"^(\d+\s+){2}(-?\d+\.\d+\s+){4}-?\d+\s*$"))
             {
                 throw new NeuronParseException("");
             }
 
+            string[] compartmentDetail = data.Trim().Split(" ", StringSplitOptions.RemoveEmptyEntries);
             return new NeuronCompartment(Int32.Parse(compartmentDetail[0]), Int32.Parse(compartmentDetail[1]),
                 float.Parse(compartmentDetail[2]), float.Parse(compartmentDetail[3]), float.Parse(compartmentDetail[4]),
                 float.Parse(compartmentDetail[5]), Int32.Parse(compartmentDetail[6]));
