@@ -138,6 +138,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: NeuronGenerator
       objectReference: {fileID: 0}
+    - target: {fileID: 1795515502409302852, guid: 52ae78b67111ceb4f9a5340bb19295d3,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7519141369304515327, guid: 52ae78b67111ceb4f9a5340bb19295d3,
         type: 3}
       propertyPath: m_RootOrder
