@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using UnityEngine;
@@ -8,7 +9,7 @@ namespace Project.Scripts
 {
     public class NeuronRepository
     {
-        public Neuron GetNeuron()
+        public Neuron GetNeuron(string name)
         {
             string swcData;
             switch (Application.platform)
@@ -16,7 +17,12 @@ namespace Project.Scripts
                 case RuntimePlatform.WindowsEditor:
                 case RuntimePlatform.WindowsPlayer:
                 case RuntimePlatform.WindowsServer:
-                    swcData = ReadSwcFile("pkj1599.swc");
+                    swcData = ReadSwcFile(name);
+                    break;
+                case RuntimePlatform.Android:
+                    WWW reader = new WWW(Path.Combine(Application.streamingAssetsPath, name));
+                    while (!reader.isDone) continue;
+                    swcData = reader.text;
                     break;
                 default:
                     swcData = DataFactory();

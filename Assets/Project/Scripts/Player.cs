@@ -9,7 +9,7 @@ public class Player : MonoBehaviour
     {
         // Define step value for animation
         step = 7.0f * Time.deltaTime;
-        speed = 10.0f * Time.deltaTime;
+        speed = 15.0f * Time.deltaTime;
 
         if (OVRInput.Get(OVRInput.Button.PrimaryThumbstickLeft)) transform.Rotate(0, -5.0f * step, 0);
         if (OVRInput.Get(OVRInput.Button.PrimaryThumbstickRight)) transform.Rotate(0, 5.0f * step, 0);
