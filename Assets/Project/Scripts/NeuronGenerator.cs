@@ -8,17 +8,21 @@ public class NeuronGenerator : MonoBehaviour
 {
     [SerializeField] private GameObject neuronCompartmentPrefab;
     [SerializeField] private GameObject neuronParent;
+    [SerializeField] private GameObject player;
     private readonly NeuronRepository _repository = new();
-
-    private readonly string[] _neuronList = {"a1247", "a1531", "a1963", "a2191", "a3783", "pkj1599",};
     private TMP_Dropdown _dropdown;
 
-    // Start is called before the first frame update
     void Start()
+    {
+        InitializeDropdown();
+    }
+
+    private void InitializeDropdown()
     {
         _dropdown = gameObject.GetComponent<TMP_Dropdown>();
         _dropdown.options = new List<TMP_Dropdown.OptionData>();
-        foreach (var neuron in _neuronList)
+        var neuronList = _repository.GetNeuronList();
+        foreach (var neuron in neuronList)
         {
             _dropdown.options.Add(new TMP_Dropdown.OptionData {text = $"{neuron}.swc"});
             _dropdown.RefreshShownValue();
@@ -28,7 +32,11 @@ public class NeuronGenerator : MonoBehaviour
     public void OnSelectedDropdown()
     {
         DestroyNeuron();
-        RenderingNeuron(_repository.GetNeuron(_dropdown.options[_dropdown.value].text));
+        var neuron = _repository.GetNeuron(_dropdown.options[_dropdown.value].text);
+        RenderingNeuron(neuron);
+        NeuronCompartment cellBody = neuron.GetCellBody();
+        if (cellBody == null) return;
+        player.transform.position = new Vector3(cellBody.PositionX, cellBody.PositionY, cellBody.PositionZ - 100.0f);
     }
 
     private void RenderingNeuron(Neuron neuron)
@@ -46,10 +54,10 @@ public class NeuronGenerator : MonoBehaviour
             NeuronCompartment parent;
             if (!neuron.Compartments.TryGetValue(nc.ParentId, out parent)) continue;
 
-            var lineRenderer = neuronCompartmentObj.AddComponent<LineRenderer>();
+            var lineRenderer = neuronCompartmentObj.GetComponent<LineRenderer>();
             lineRenderer.SetPositions(new[] {position, new(parent.PositionX, parent.PositionY, parent.PositionZ)});
             lineRenderer.startWidth = nc.Radius;
-            lineRenderer.endWidth = parent.Radius;
+            lineRenderer.endWidth = nc.Radius;
             lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
             lineRenderer.startColor = new Color(1.0f, 0.3f, 0.25f);
             lineRenderer.endColor = new Color(1.0f, 0.3f, 0.25f);

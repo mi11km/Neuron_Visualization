@@ -9,6 +9,8 @@ namespace Project.Scripts
 {
     public class NeuronRepository
     {
+        private readonly string[] _neuronList = {"a1247", "a1531", "a1963", "a2191", "a3783", "pkj1599",};
+
         public Neuron GetNeuron(string name)
         {
             string swcData;
@@ -30,6 +32,11 @@ namespace Project.Scripts
             }
 
             return Parse(swcData);
+        }
+
+        public string[] GetNeuronList()
+        {
+            return _neuronList;
         }
 
         private string ReadSwcFile(string fileName)

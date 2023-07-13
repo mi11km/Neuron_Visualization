@@ -10,6 +10,19 @@ namespace Project.Scripts
         {
             Compartments = new Dictionary<int, NeuronCompartment>();
         }
+
+        public NeuronCompartment GetCellBody()
+        {
+            foreach (var compartment in Compartments.Values)
+            {
+                if (compartment.Type == 1)
+                {
+                    return compartment;
+                }
+            }
+
+            return null;
+        }
     }
 
     public class NeuronCompartment
