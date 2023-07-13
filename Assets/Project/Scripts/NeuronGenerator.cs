@@ -37,6 +37,7 @@ public class NeuronGenerator : MonoBehaviour
         NeuronCompartment cellBody = neuron.GetCellBody();
         if (cellBody == null) return;
         player.transform.position = new Vector3(cellBody.PositionX, cellBody.PositionY, cellBody.PositionZ - 100.0f);
+        player.transform.LookAt(new Vector3(cellBody.PositionX, cellBody.PositionY, cellBody.PositionZ));
     }
 
     private void RenderingNeuron(Neuron neuron)
