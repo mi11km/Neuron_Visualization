@@ -15,6 +15,7 @@ public class NeuronGenerator : MonoBehaviour
     void Start()
     {
         InitializeDropdown();
+        OnSelectedDropdown();
     }
 
     private void InitializeDropdown()

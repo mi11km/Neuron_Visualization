@@ -4,43 +4,55 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
     [SerializeField] private GameObject menu;
+    [SerializeField] private Camera centerCamera;
 
+    private CharacterController _controller;
     private AudioSource _audioSource;
+
     private bool _shouldShowMenu;
-    private float _step;
-    private float _speed;
+    private readonly float _speed = 30.0f;
+
+    private Vector3 _movement;
+    private Vector3 _moveDir = Vector3.zero;
+    private float _moveH;
+    private float _moveV;
 
     void Start()
     {
         _audioSource = GetComponent<AudioSource>();
-        _shouldShowMenu = false;
+        _controller = GetComponent<CharacterController>();
+        _shouldShowMenu = true;
         menu.SetActive(_shouldShowMenu);
     }
 
     void Update()
     {
-        _step = 7.0f * Time.deltaTime;
-        _speed = 15.0f * Time.deltaTime;
-
-        if (OVRInput.Get(OVRInput.Button.PrimaryThumbstickLeft)) transform.Rotate(0, -5.0f * _step, 0);
-        if (OVRInput.Get(OVRInput.Button.PrimaryThumbstickRight)) transform.Rotate(0, 5.0f * _step, 0);
-        if (OVRInput.Get(OVRInput.Button.PrimaryThumbstickUp)) transform.Rotate(-5.0f * _step, 0, 0);
-        if (OVRInput.Get(OVRInput.Button.PrimaryThumbstickDown)) transform.Rotate(5.0f * _step, 0, 0);
-
-        if (OVRInput.Get(OVRInput.Button.SecondaryThumbstickUp)) transform.Translate(Vector3.forward * _speed);
-        if (OVRInput.Get(OVRInput.Button.SecondaryThumbstickDown)) transform.Translate(Vector3.back * _speed);
-        if (OVRInput.Get(OVRInput.Button.SecondaryThumbstickLeft)) transform.Translate(Vector3.left * _speed);
-        if (OVRInput.Get(OVRInput.Button.SecondaryThumbstickRight)) transform.Translate(Vector3.right * _speed);
-        if (OVRInput.Get(OVRInput.Button.Two)) transform.Translate(Vector3.up * _speed);
-        if (OVRInput.Get(OVRInput.Button.One)) transform.Translate(Vector3.down * _speed);
-
-        if (OVRInput.Get(OVRInput.Button.Three)) transform.position = new Vector3(0, 0, 0);
-
         if (OVRInput.GetDown(OVRInput.Button.Start))
         {
             _shouldShowMenu = !_shouldShowMenu;
             menu.SetActive(_shouldShowMenu);
             _audioSource.Play();
         }
+
+        if (OVRInput.Get(OVRInput.Button.SecondaryThumbstickUp) ||
+            OVRInput.Get(OVRInput.Button.SecondaryThumbstickDown) ||
+            OVRInput.Get(OVRInput.Button.SecondaryThumbstickLeft) ||
+            OVRInput.Get(OVRInput.Button.SecondaryThumbstickRight))
+        {
+            _moveH = OVRInput.Get(OVRInput.RawAxis2D.RThumbstick).x;
+            _moveV = OVRInput.Get(OVRInput.RawAxis2D.RThumbstick).y;
+            _movement = new Vector3(_moveH, 0, _moveV);
+            _moveDir = centerCamera.transform.forward * _movement.z + centerCamera.transform.right * _movement.x;
+            _controller.Move(_speed * Time.deltaTime * _moveDir);
+        }
+
+        if (OVRInput.Get(OVRInput.Button.Two)) transform.Translate(_speed * Time.deltaTime * centerCamera.transform.up);
+        if (OVRInput.Get(OVRInput.Button.One))
+            transform.Translate(_speed * Time.deltaTime * -1 * centerCamera.transform.up);
+
+        if (OVRInput.Get(OVRInput.Button.PrimaryThumbstickLeft)) transform.Rotate(0, -2 * _speed * Time.deltaTime, 0);
+        if (OVRInput.Get(OVRInput.Button.PrimaryThumbstickRight)) transform.Rotate(0, 2 * _speed * Time.deltaTime, 0);
+        if (OVRInput.Get(OVRInput.Button.PrimaryThumbstickUp)) transform.Rotate(-2 * _speed * Time.deltaTime, 0, 0);
+        if (OVRInput.Get(OVRInput.Button.PrimaryThumbstickDown)) transform.Rotate(2 * _speed * Time.deltaTime, 0, 0);
     }
 }
